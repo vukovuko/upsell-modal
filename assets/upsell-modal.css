@@ -1,0 +1,102 @@
+.upsell-modal {
+  --upsell-modal-offset: var(--padding-sm);
+  --upsell-modal-top: calc(var(--upsell-modal-offset) + var(--padding-block-start));
+  --upsell-modal-right: calc(var(--upsell-modal-offset) + var(--padding-inline-end));
+  --upsell-modal-bottom: calc(var(--upsell-modal-offset) + var(--padding-block-end));
+  --upsell-modal-left: calc(var(--upsell-modal-offset) + var(--padding-inline-end));
+
+  position: absolute;
+  display: var(--quick-add-mobile-display, none);
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: flex-end;
+  inset: max(var(--upsell-modal-top), calc((var(--border-radius) + var(--upsell-modal-top)) * (1 - cos(45deg))))
+    max(var(--upsell-modal-right), calc((var(--border-radius) + var(--upsell-modal-right)) * (1 - cos(45deg))))
+    max(var(--upsell-modal-bottom), calc((var(--border-radius) + var(--upsell-modal-bottom)) * (1 - cos(45deg))))
+    max(var(--upsell-modal-left), calc((var(--border-radius) + var(--upsell-modal-left)) * (1 - cos(45deg))));
+  width: auto;
+  height: auto;
+  z-index: var(--layer-raised);
+  cursor: default;
+  pointer-events: none;
+
+  @media screen and (min-width: 750px) {
+    --upsell-modal-offset: var(--padding-md);
+
+    display: var(--quick-add-display, flex);
+  }
+}
+
+.upsell-modal[class*='color-scheme-'] {
+  background-color: transparent;
+}
+
+.upsell-modal__button {
+  display: grid;
+  padding: var(--padding-xs);
+  align-items: center;
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  border-color: transparent;
+  box-shadow: var(--shadow-popover);
+  pointer-events: all;
+  position: relative;
+  overflow: hidden;
+  border-radius: 100px;
+
+  @media screen and (min-width: 750px) {
+    display: none;
+    padding: var(--padding-xs) var(--padding-sm);
+  }
+}
+
+@media screen and (min-width: 750px) {
+  product-card:focus-within .upsell-modal__button,
+  .card-gallery:hover .upsell-modal__button {
+    display: grid;
+    will-change: margin, opacity;
+    animation: elementSlideInTop var(--animation-speed) var(--animation-easing);
+  }
+}
+
+.upsell-modal__button .add-to-cart-text {
+  gap: 0;
+  line-height: 1;
+  grid-row: 1 / span 1;
+  grid-column: 1 / span 1;
+  animation: none;
+
+  @media screen and (min-width: 750px) {
+    margin-inline: calc(var(--padding-sm) * -1);
+    padding-inline: var(--padding-xs);
+  }
+}
+
+.upsell-modal__button .add-to-cart-text__content {
+  width: 0;
+  opacity: 0;
+  transform: translateX(1em);
+  transition: width var(--animation-speed) ease-in-out, opacity var(--animation-speed) ease-in-out,
+    transform var(--animation-speed) ease-in-out;
+  interpolate-size: allow-keywords;
+  will-change: width, opacity, transform;
+}
+
+@container (min-width: 99px) {
+  .upsell-modal[stay-visible] .add-to-cart-text,
+  .upsell-modal__button:is(:focus, :hover) .add-to-cart-text {
+    gap: var(--gap-2xs);
+
+    @media screen and (min-width: 750px) {
+      margin-inline: 0;
+      padding-inline: 0;
+    }
+  }
+
+  .upsell-modal[stay-visible] .add-to-cart-text__content,
+  .upsell-modal__button:is(:focus, :hover) .add-to-cart-text__content {
+    width: fit-content;
+    opacity: 1;
+    transform: translateX(0);
+  }
+}

@@ -350,6 +350,7 @@
     "product_card_media": "Media",
     "product_card_rendering": "Product card rendering",
     "product_cards": "Product cards",
+    "product_collection_upsell": "Products with upsells",
     "product_description": "Description",
     // Layout option for displaying products in rows and columns
     "product_grid": "Grid",

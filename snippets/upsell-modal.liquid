@@ -1,0 +1,41 @@
+{%- liquid
+  assign variant_to_use = product.selected_or_first_available_variant
+
+  if variant_to_use.available
+    assign can_add_to_cart = true
+  else
+    assign can_add_to_cart = false
+  endif
+-%}
+
+<upsell-modal-component
+  class="upsell-modal"
+  ref="upsellModal"
+  data-product-id="{{ product.id }}"
+  data-product-handle="{{ product.handle }}"
+  data-product-title="{{ product.title }}"
+  data-variant-id="{{ variant_to_use.id }}"
+>
+  <add-to-cart-component
+    ref="addToCartButtonContainer"
+    data-add-to-cart-animation="false"
+  >
+    <button
+      type="button"
+      name="add"
+      ref="addToCartButton"
+      on:click="upsell-modal-component/handleClick"
+      class="button upsell-modal__button"
+      {% unless can_add_to_cart %}disabled{% endunless %}
+    >
+      <span class="add-to-cart-text">
+        <span class="svg-wrapper add-to-cart-icon">
+          {{- 'icon-add-to-cart.svg' | inline_asset_content -}}
+        </span>
+        <span class="add-to-cart-text__content">
+          {{- 'actions.add' | t -}}
+        </span>
+      </span>
+    </button>
+  </add-to-cart-component>
+</upsell-modal-component>
