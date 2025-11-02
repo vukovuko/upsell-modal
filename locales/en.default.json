@@ -323,7 +323,12 @@
       "quantity_increments": "Increments of {{ increment }}",
       "quantity_minimum": "Minimum of {{ minimum }}",
       "quantity_maximum": "Maximum of {{ maximum }}",
-      "in_cart": "in cart"
+      "in_cart": "in cart",
+      "sku_label": "SKU: {{ sku }}"
     }
+  },
+  "upsell_modal": {
+    "error_loading": "Unable to load products. Please try again.",
+    "confirm": "Confirm"
   }
 }
