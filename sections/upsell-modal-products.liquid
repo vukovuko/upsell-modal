@@ -4,6 +4,7 @@
 -%}
 
 <upsell-modal-content-component class="upsell-content">
+  <template ref="moneyFormat">{{ shop.money_format }}</template>
   <div class="upsell-content__header">
     <h2 class="upsell-content__heading">{{ 'upsell_modal.heading' | t }}</h2>
     <button
@@ -39,11 +40,30 @@
       </div>
       <div class="upsell-product-card__details">
         <h3 class="upsell-product-card__title">{{ product.title }}</h3>
+        {%- if product.variants.size > 1 -%}
+          <div class="upsell-variant-selectors">
+            {%- for option in product.options_with_values -%}
+              <select class="upsell-variant-selector" data-option-position="{{ forloop.index }}">
+                {%- for value in option.values -%}
+                  <option value="{{ value }}" {% if option.selected_value == value %}selected{% endif %}>
+                    {{ value }}
+                  </option>
+                {%- endfor -%}
+              </select>
+            {%- endfor -%}
+          </div>
+        {%- endif -%}
         {%- if main_variant.sku != blank -%}
           <p class="upsell-product-card__sku">{{ 'products.product.sku_label' | t: sku: main_variant.sku }}</p>
         {%- endif -%}
         <p class="upsell-product-card__price">{{ main_variant.price | money }}</p>
+        <span class="upsell-product-card__badge upsell-product-card__badge--soldout" style="display: none;">{{ 'products.product.sold_out' | t }}</span>
       </div>
+      {%- if product.variants.size > 1 -%}
+        <script type="application/json">
+          {{ product.variants | json }}
+        </script>
+      {%- endif -%}
     </div>
 
     {%- if product.metafields.custom.upsell -%}
@@ -76,17 +96,31 @@
             {%- endif -%}
           </div>
           <div class="upsell-product-card__details">
-            <h3 class="upsell-product-card__title">
-              {{ upsell_product.title }}
-              {%- unless is_available -%}
-                <span class="upsell-product-card__badge">{{ 'products.product.sold_out' | t }}</span>
-              {%- endunless -%}
-            </h3>
+            <h3 class="upsell-product-card__title">{{ upsell_product.title }}</h3>
+            {%- if upsell_product.variants.size > 1 -%}
+              <div class="upsell-variant-selectors">
+                {%- for option in upsell_product.options_with_values -%}
+                  <select class="upsell-variant-selector" data-option-position="{{ forloop.index }}">
+                    {%- for value in option.values -%}
+                      <option value="{{ value }}" {% if option.selected_value == value %}selected{% endif %}>
+                        {{ value }}
+                      </option>
+                    {%- endfor -%}
+                  </select>
+                {%- endfor -%}
+              </div>
+            {%- endif -%}
             {%- if upsell_variant.sku != blank -%}
               <p class="upsell-product-card__sku">{{ 'products.product.sku_label' | t: sku: upsell_variant.sku }}</p>
             {%- endif -%}
             <p class="upsell-product-card__price">{{ upsell_variant.price | money }}</p>
+            <span class="upsell-product-card__badge upsell-product-card__badge--soldout" {% if is_available %}style="display: none;"{% endif %}>{{ 'products.product.sold_out' | t }}</span>
           </div>
+          {%- if upsell_product.variants.size > 1 -%}
+            <script type="application/json">
+              {{ upsell_product.variants | json }}
+            </script>
+          {%- endif -%}
         </div>
       {%- endfor -%}
     {%- endif -%}
