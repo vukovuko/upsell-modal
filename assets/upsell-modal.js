@@ -127,6 +127,10 @@ class UpsellModalContentComponent extends Component {
       closeButton.addEventListener('click', this.#handleClose);
     }
 
+    this.querySelectorAll('.upsell-variant-selector').forEach((select) => {
+      select.addEventListener('change', this.#handleVariantChange);
+    });
+
     this.#updateSubtotal();
   }
 
@@ -139,6 +143,11 @@ class UpsellModalContentComponent extends Component {
 
   /** @param {Event} event */
   #handleCardClick = (event) => {
+    const target = /** @type {HTMLElement} */ (event.target);
+
+    if (target instanceof HTMLInputElement && target.type === 'checkbox') return;
+    if (target instanceof HTMLSelectElement) return;
+
     const card = /** @type {HTMLElement} */ (event.currentTarget);
     const checkbox = card.querySelector('input[type="checkbox"]');
 
@@ -158,6 +167,87 @@ class UpsellModalContentComponent extends Component {
       card.dataset.selected = checkbox.checked ? 'true' : 'false';
       this.#updateSubtotal();
     }
+  };
+
+  /** @param {Event} event */
+  #handleVariantChange = (event) => {
+    const select = /** @type {HTMLSelectElement} */ (event.target);
+    const card = /** @type {HTMLElement} */ (select.closest('.upsell-product-card'));
+    if (!card) return;
+
+    const variantScript = card.querySelector('script[type="application/json"]');
+    if (!variantScript?.textContent) return;
+
+    const variants = JSON.parse(variantScript.textContent);
+    const selectors = card.querySelectorAll('.upsell-variant-selector');
+
+    /** @type {string[]} */
+    const selectedOptions = [];
+    selectors.forEach((sel) => {
+      if (sel instanceof HTMLSelectElement) {
+        selectedOptions.push(sel.value);
+      }
+    });
+
+    const matchedVariant = variants.find((/** @type {any} */ v) => {
+      return (
+        v.option1 === selectedOptions[0] &&
+        (v.option2 === selectedOptions[1] || v.option2 === null) &&
+        (v.option3 === selectedOptions[2] || v.option3 === null)
+      );
+    });
+
+    if (!matchedVariant) return;
+
+    card.dataset.variantId = matchedVariant.id;
+    card.dataset.price = matchedVariant.price;
+
+    const priceElement = card.querySelector('.upsell-product-card__price');
+    if (priceElement) {
+      priceElement.textContent = this.#formatMoney(matchedVariant.price);
+    }
+
+    const skuElement = card.querySelector('.upsell-product-card__sku');
+    if (matchedVariant.sku) {
+      if (skuElement) {
+        skuElement.textContent = `SKU: ${matchedVariant.sku}`;
+      }
+    } else if (skuElement) {
+      skuElement.textContent = '';
+    }
+
+    const imgElement = /** @type {HTMLImageElement} */ (card.querySelector('.upsell-product-card__img'));
+    if (imgElement && matchedVariant.featured_image) {
+      imgElement.src = matchedVariant.featured_image.src;
+      card.dataset.productImage = matchedVariant.featured_image.src;
+    }
+
+    const isMainProduct = card.classList.contains('upsell-product-card--main');
+
+    if (!isMainProduct) {
+      const checkbox = card.querySelector('input[type="checkbox"]');
+      const badge = /** @type {HTMLElement} */ (card.querySelector('.upsell-product-card__badge--soldout'));
+
+      if (matchedVariant.available) {
+        card.classList.remove('upsell-product-card--unavailable');
+        if (checkbox instanceof HTMLInputElement) {
+          checkbox.disabled = false;
+          checkbox.checked = true;
+          card.dataset.selected = 'true';
+        }
+        if (badge) badge.style.display = 'none';
+      } else {
+        card.classList.add('upsell-product-card--unavailable');
+        if (checkbox instanceof HTMLInputElement) {
+          checkbox.disabled = true;
+          checkbox.checked = false;
+          card.dataset.selected = 'false';
+        }
+        if (badge) badge.style.display = '';
+      }
+    }
+
+    this.#updateSubtotal();
   };
 
   #handleConfirm = async () => {
@@ -226,9 +316,50 @@ class UpsellModalContentComponent extends Component {
 
   /** @param {number} cents */
   #formatMoney = (cents) => {
-    return (cents / 100).toLocaleString('en-US', {
-      style: 'currency',
-      currency: 'USD',
+    const moneyFormatTemplate = this.querySelector('template[ref="moneyFormat"]');
+    if (!(moneyFormatTemplate instanceof HTMLTemplateElement)) {
+      return (cents / 100).toFixed(2);
+    }
+
+    const template = moneyFormatTemplate.content.textContent || '{{amount}}';
+
+    return template.replace(/{{\s*(\w+)\s*}}/g, (_, placeholder) => {
+      if (typeof placeholder !== 'string') return '';
+
+      let thousandsSeparator = ',';
+      let decimalSeparator = '.';
+      let precision = 2;
+
+      if (placeholder === 'amount_no_decimals') {
+        precision = 0;
+      } else if (placeholder === 'amount_with_comma_separator') {
+        thousandsSeparator = '.';
+        decimalSeparator = ',';
+      } else if (placeholder === 'amount_no_decimals_with_comma_separator') {
+        thousandsSeparator = '.';
+        precision = 0;
+      } else if (placeholder === 'amount_no_decimals_with_space_separator') {
+        thousandsSeparator = ' ';
+        precision = 0;
+      } else if (placeholder === 'amount_with_space_separator') {
+        thousandsSeparator = ' ';
+        decimalSeparator = ',';
+      } else if (placeholder === 'amount_with_period_and_space_separator') {
+        thousandsSeparator = ' ';
+        decimalSeparator = '.';
+      } else if (placeholder === 'amount_with_apostrophe_separator') {
+        thousandsSeparator = "'";
+        decimalSeparator = '.';
+      }
+
+      const roundedNumber = (cents / 100).toFixed(precision);
+      let [a, b] = roundedNumber.split('.');
+      if (!a) a = '0';
+      if (!b) b = '';
+
+      a = a.replace(/\d(?=(\d\d\d)+(?!\d))/g, (digit) => digit + thousandsSeparator);
+
+      return precision <= 0 ? a : a + decimalSeparator + b.padEnd(precision, '0');
     });
   };
 }
