@@ -36,6 +36,8 @@
               loading: 'lazy',
               class: 'upsell-product-card__img'
           -}}
+        {%- else -%}
+          {{- 'product-1' | placeholder_svg_tag: 'upsell-product-card__img upsell-product-card__img--placeholder' -}}
         {%- endif -%}
       </div>
       <div class="upsell-product-card__details">
@@ -93,6 +95,8 @@
                   loading: 'lazy',
                   class: 'upsell-product-card__img'
               -}}
+            {%- else -%}
+              {{- 'product-1' | placeholder_svg_tag: 'upsell-product-card__img upsell-product-card__img--placeholder' -}}
             {%- endif -%}
           </div>
           <div class="upsell-product-card__details">
