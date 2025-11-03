@@ -1,0 +1,116 @@
+{%- liquid
+  assign main_variant = product.selected_or_first_available_variant
+  assign main_image = main_variant.featured_media | default: product.featured_media
+-%}
+
+<upsell-modal-content-component class="upsell-content">
+  <div class="upsell-content__header">
+    <h2 class="upsell-content__heading">{{ 'upsell_modal.heading' | t }}</h2>
+    <button
+      class="button button-unstyled upsell-content__close"
+      aria-label="{{ 'accessibility.close_dialog' | t }}"
+      type="button"
+    >
+      {{- 'icon-close.svg' | inline_asset_content -}}
+    </button>
+  </div>
+  <div class="upsell-products">
+    <div class="upsell-product-card upsell-product-card--main"
+         data-variant-id="{{ main_variant.id }}"
+         data-price="{{ main_variant.price }}"
+         data-product-image="{{ main_image | image_url: width: 300 }}"
+         data-selected="true">
+      <div class="upsell-product-card__checkbox">
+        <input type="checkbox" checked disabled>
+      </div>
+      <div class="upsell-product-card__image">
+        {%- if main_image -%}
+          {{-
+            main_image
+            | image_url: width: 300
+            | image_tag:
+              widths: '80, 160, 240, 300',
+              sizes: '80px',
+              alt: product.title,
+              loading: 'lazy',
+              class: 'upsell-product-card__img'
+          -}}
+        {%- endif -%}
+      </div>
+      <div class="upsell-product-card__details">
+        <h3 class="upsell-product-card__title">{{ product.title }}</h3>
+        {%- if main_variant.sku != blank -%}
+          <p class="upsell-product-card__sku">{{ 'products.product.sku_label' | t: sku: main_variant.sku }}</p>
+        {%- endif -%}
+        <p class="upsell-product-card__price">{{ main_variant.price | money }}</p>
+      </div>
+    </div>
+
+    {%- if product.metafields.custom.upsell -%}
+      {%- for upsell_product in product.metafields.custom.upsell.value -%}
+        {%- liquid
+          assign upsell_variant = upsell_product.selected_or_first_available_variant
+          assign upsell_image = upsell_variant.featured_media | default: upsell_product.featured_media
+          assign is_available = upsell_variant.available
+        -%}
+        <div class="upsell-product-card{% unless is_available %} upsell-product-card--unavailable{% endunless %}"
+             data-variant-id="{{ upsell_variant.id }}"
+             data-price="{{ upsell_variant.price }}"
+             data-product-image="{{ upsell_image | image_url: width: 300 }}"
+             data-selected="false">
+          <div class="upsell-product-card__checkbox">
+            <input type="checkbox"{% unless is_available %} disabled{% endunless %}>
+          </div>
+          <div class="upsell-product-card__image">
+            {%- if upsell_image -%}
+              {{-
+                upsell_image
+                | image_url: width: 300
+                | image_tag:
+                  widths: '80, 160, 240, 300',
+                  sizes: '80px',
+                  alt: upsell_product.title,
+                  loading: 'lazy',
+                  class: 'upsell-product-card__img'
+              -}}
+            {%- endif -%}
+          </div>
+          <div class="upsell-product-card__details">
+            <h3 class="upsell-product-card__title">
+              {{ upsell_product.title }}
+              {%- unless is_available -%}
+                <span class="upsell-product-card__badge">{{ 'products.product.sold_out' | t }}</span>
+              {%- endunless -%}
+            </h3>
+            {%- if upsell_variant.sku != blank -%}
+              <p class="upsell-product-card__sku">{{ 'products.product.sku_label' | t: sku: upsell_variant.sku }}</p>
+            {%- endif -%}
+            <p class="upsell-product-card__price">{{ upsell_variant.price | money }}</p>
+          </div>
+        </div>
+      {%- endfor -%}
+    {%- endif -%}
+  </div>
+
+  <div class="upsell-footer">
+    <div class="upsell-footer__subtotal">
+      <span class="upsell-footer__subtotal-label">{{ 'content.cart_subtotal' | t }}</span>
+      <span class="upsell-footer__subtotal-amount">{{ main_variant.price | money }}</span>
+    </div>
+    <button type="button" class="button upsell-footer__confirm">
+      <span class="add-to-cart-text">
+        <span class="add-to-cart-text__content">
+          {{ 'upsell_modal.confirm' | t }}
+        </span>
+      </span>
+      <span aria-hidden="true" class="add-to-cart-text--added">
+        <span class="svg-wrapper add-to-cart-icon--added">
+          {{- 'icon-checkmark.svg' | inline_asset_content -}}
+        </span>
+        <span>
+          {{- 'actions.added' | t -}}
+        </span>
+      </span>
+    </button>
+  </div>
+</upsell-modal-content-component>
