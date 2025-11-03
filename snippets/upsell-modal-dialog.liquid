@@ -4,14 +4,6 @@
     ref="dialog"
     scroll-lock
   >
-    <button
-      ref="closeButton"
-      on:click="/closeDialog"
-      class="button button-unstyled close-button upsell-modal-dialog__close"
-      aria-label="{{ 'accessibility.close_dialog' | t }}"
-    >
-      {{- 'icon-close.svg' | inline_asset_content -}}
-    </button>
     <div
       id="upsell-modal-content"
       class="upsell-modal-dialog__content"

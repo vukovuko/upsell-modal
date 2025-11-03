@@ -4,6 +4,16 @@
 -%}
 
 <upsell-modal-content-component class="upsell-content">
+  <div class="upsell-content__header">
+    <h2 class="upsell-content__heading">{{ 'upsell_modal.heading' | t }}</h2>
+    <button
+      class="button button-unstyled upsell-content__close"
+      aria-label="{{ 'accessibility.close_dialog' | t }}"
+      type="button"
+    >
+      {{- 'icon-close.svg' | inline_asset_content -}}
+    </button>
+  </div>
   <div class="upsell-products">
     <div class="upsell-product-card upsell-product-card--main"
          data-variant-id="{{ main_variant.id }}"

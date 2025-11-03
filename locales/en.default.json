@@ -328,6 +328,7 @@
     }
   },
   "upsell_modal": {
+    "heading": "You may also like",
     "error_loading": "Unable to load products. Please try again.",
     "confirm": "Confirm"
   }

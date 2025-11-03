@@ -122,8 +122,20 @@ class UpsellModalContentComponent extends Component {
       confirmButton.addEventListener('click', this.#handleConfirm);
     }
 
+    const closeButton = this.querySelector('.upsell-content__close');
+    if (closeButton) {
+      closeButton.addEventListener('click', this.#handleClose);
+    }
+
     this.#updateSubtotal();
   }
+
+  #handleClose = () => {
+    const dialog = document.getElementById('upsell-modal-dialog');
+    if (dialog instanceof UpsellModalDialog) {
+      dialog.closeDialog();
+    }
+  };
 
   /** @param {Event} event */
   #handleCardClick = (event) => {

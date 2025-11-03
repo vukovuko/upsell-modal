@@ -133,18 +133,6 @@
   animation: modalSlideOutTop var(--animation-speed) var(--animation-easing) forwards;
 }
 
-.upsell-modal-dialog__close {
-  position: absolute;
-  top: var(--margin-2xs);
-  right: var(--margin-2xs);
-  transition: transform 0.15s var(--animation-timing-bounce);
-  z-index: var(--layer-raised);
-}
-
-.upsell-modal-dialog__close:active {
-  transform: scale(0.8);
-}
-
 /* Upsell Modal Content */
 .upsell-modal-dialog__content {
   display: block !important;
@@ -161,6 +149,28 @@
   flex-direction: column;
   gap: var(--gap-lg);
   padding: var(--padding-lg);
+}
+
+.upsell-content__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--gap-sm);
+}
+
+.upsell-content__heading {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.upsell-content__close {
+  transition: transform 0.15s var(--animation-timing-bounce);
+}
+
+.upsell-content__close:active {
+  transform: scale(0.8);
 }
 
 .upsell-products {
@@ -219,7 +229,7 @@
 
 .upsell-product-card__checkbox input[type="checkbox"]:disabled {
   cursor: not-allowed;
-  opacity: 0.5;
+  opacity: 0.9;
 }
 
 .upsell-product-card--unavailable {
